@@ -98,4 +98,9 @@ class BCAnimator {
             }
         }
     }
+    companion object {
+        val BCANIMATOR : BCAnimator = BCAnimator()
+        fun getInstance() : BCAnimator = BCANIMATOR
+
+    }
 }
