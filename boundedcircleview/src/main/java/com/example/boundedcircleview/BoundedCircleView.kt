@@ -8,6 +8,7 @@ import android.content.Context
 import android.graphics.*
 import android.view.View
 import android.view.MotionEvent
+import java.util.*
 
 class BoundedCircleView (ctx : Context) : View(ctx) {
 
@@ -51,4 +52,52 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
             }
         }
     }
+
+    data class BoundedCircle(var i : Int, val state : State = State()) {
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w : Float = canvas.width.toFloat()
+            val h : Float = canvas.height.toFloat()
+            val l : Float = (Math.min(w, h) / 3) * state.scales[1]
+            val r : Float = Math.min(w,h)/10
+            val deg : Float = 360f * state.scales[0]
+            val pointAt135 : PointF = PointF(l + r * Math.cos(3 * Math.PI/4).toFloat(), l + r * Math.sin(3 * Math.PI/4).toFloat())
+            val pointAt45 : PointF = PointF( r * Math.cos (-Math.PI/4).toFloat(), l + r * Math.sin(-Math.PI/4).toFloat())
+            val drawArc : () -> Unit = {
+                canvas.drawArc(RectF(-r, -r, r, r), 0f, deg, false, paint)
+            }
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = Math.min(w, h) / 50
+            paint.strokeCap = Paint.Cap.ROUND
+            canvas.save()
+            canvas.translate(w/2, h/2)
+            drawArc()
+            for (i in 0..3) {
+                canvas.save()
+                canvas.rotate(90f * i)
+                canvas.drawLine(r, 0f, l -r, 0f, paint)
+                canvas.save()
+                canvas.translate(l, 0f)
+                drawArc()
+                canvas.restore()
+                if (state.j == 2) {
+                    canvas.drawPointLine(pointAt135, pointAt45, state.scales[2], paint)
+                }
+                canvas.restore()
+            }
+            canvas.restore()
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
+}
+
+fun Canvas.drawPointLine(point1 : PointF, point2 : PointF, scale : Float, paint : Paint) {
+    drawLine(point1.x, point1.y, point1.x + (point2.x - point1.x) * scale, (point1.y) + (point2.y - point1.y) * scale, paint)
 }
