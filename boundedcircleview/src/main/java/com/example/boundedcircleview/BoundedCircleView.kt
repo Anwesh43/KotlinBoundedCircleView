@@ -8,7 +8,6 @@ import android.content.Context
 import android.graphics.*
 import android.view.View
 import android.view.MotionEvent
-import java.util.*
 
 class BoundedCircleView (ctx : Context) : View(ctx) {
 
@@ -98,6 +97,25 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
 
         fun startUpdating(startcb : () -> Unit) {
             state.startUpdating(startcb)
+        }
+    }
+
+    data class Renderer(var view : BoundedCircleView) {
+
+        private val boundedCircle : BoundedCircle = BoundedCircle(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            boundedCircle.draw(canvas, paint)
+            boundedCircle.update {
+                BCAnimator.getInstance().stop(view)
+            }
+        }
+
+        fun handleTap() {
+            boundedCircle.startUpdating {
+                BCAnimator.getInstance().start(view)
+            }
         }
     }
 }
