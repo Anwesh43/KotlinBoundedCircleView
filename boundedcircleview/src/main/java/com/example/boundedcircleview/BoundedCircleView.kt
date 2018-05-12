@@ -9,6 +9,7 @@ import android.content.Context
 import android.graphics.*
 import android.view.View
 import android.view.MotionEvent
+import android.view.ViewGroup
 
 class BoundedCircleView (ctx : Context) : View(ctx) {
 
@@ -75,8 +76,10 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = Math.min(w, h) / 50
             paint.strokeCap = Paint.Cap.ROUND
+            paint.color = Color.parseColor("#9b59b6")
             canvas.save()
             canvas.translate(w/2, h/2)
+            canvas.rotate(90f * state.scales[2])
             drawArc()
             for (i in 0..3) {
                 canvas.save()
@@ -87,7 +90,7 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
                 drawArc()
                 canvas.restore()
                 if (state.j == 2) {
-                    canvas.drawPointLine(pointAt135, pointAt45, state.scales[2], paint)
+                    canvas.drawPointLine(pointAt135, pointAt45, state.scales[1], paint)
                 }
                 canvas.restore()
             }
@@ -124,9 +127,11 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
 
     companion object {
 
-        fun create(activity : Activity) : BoundedCircleView {
+        fun create(activity : Activity, x : Float, y : Float, w : Int, h : Int) : BoundedCircleView {
             val view : BoundedCircleView = BoundedCircleView(activity)
-            activity.setContentView(view)
+            activity.addContentView(view, ViewGroup.LayoutParams(w, h))
+            view.x = x
+            view.y = y
             return view
         }
 
