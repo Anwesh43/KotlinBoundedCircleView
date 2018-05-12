@@ -9,13 +9,42 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 class BCAnimator {
 
-    fun start(view : View) {
+    val runner : BCRunner = BCRunner(0)
 
+    var t : Thread ?= null
+
+    fun start(view : View) {
+        runner.start(view, {
+            t = Thread(runner)
+            t?.start()
+        })
     }
 
     fun stop(view : View) {
-
+        runner.stop(view)
     }
+
+    fun pause() {
+        if (runner.pause()) {
+            while(true) {
+                try {
+                    t?.join()
+                    break
+                }
+                catch (ex : Exception) {
+
+                }
+            }
+        }
+    }
+
+    fun resume() {
+        runner.resume {
+            t = Thread(runner)
+            t?.start()
+        }
+    }
+
 
     data class BCRunner(var i : Int) : Runnable {
 
