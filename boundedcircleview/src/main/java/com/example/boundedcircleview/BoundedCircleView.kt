@@ -36,7 +36,7 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
 
     data class State(var prevScale : Float = 0f, var dir : Float = 0f, var j : Int = 0) {
 
-        val scales : Array<Float> = arrayOf(0f, 0f, 0f)
+        val scales : Array<Float> = arrayOf(0f, 0f, 0f, 0f)
 
         fun update(stopcb : (Float) -> Unit) {
             scales[j] += dir * 0.1f
@@ -68,29 +68,31 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
             val l : Float = (Math.min(w, h) / 3) * state.scales[1]
             val r : Float = Math.min(w,h)/10
             val deg : Float = 360f * state.scales[0]
-            val pointAt135 : PointF = PointF(l + r * Math.cos(3 * Math.PI/4).toFloat(), l + r * Math.sin(3 * Math.PI/4).toFloat())
-            val pointAt45 : PointF = PointF( r * Math.cos (-Math.PI/4).toFloat(), l + r * Math.sin(-Math.PI/4).toFloat())
+            val pointAt135 : PointF = PointF((l+r) + r * Math.cos(3 * Math.PI/4).toFloat(),  r * Math.sin(3 * Math.PI/4).toFloat())
+            val pointAt45 : PointF = PointF( r * Math.cos (-Math.PI/4).toFloat(), (l + r) + r * Math.sin(-Math.PI/4).toFloat())
             val drawArc : () -> Unit = {
                 canvas.drawArc(RectF(-r, -r, r, r), 0f, deg, false, paint)
             }
             paint.style = Paint.Style.STROKE
-            paint.strokeWidth = Math.min(w, h) / 50
+            paint.strokeWidth = Math.min(w, h) / 30
             paint.strokeCap = Paint.Cap.ROUND
             paint.color = Color.parseColor("#9b59b6")
             canvas.save()
             canvas.translate(w/2, h/2)
             canvas.rotate(90f * state.scales[2])
             drawArc()
-            for (i in 0..3) {
+            for (i in 1..4*state.scales[0].toInt()) {
+                paint.strokeWidth = Math.min(w, h) / 30
                 canvas.save()
-                canvas.rotate(90f * i)
-                canvas.drawLine(r, 0f, l -r, 0f, paint)
+                canvas.rotate(90f * (i-1))
+                canvas.drawLine(r, 0f, l - r, 0f, paint)
                 canvas.save()
                 canvas.translate(l, 0f)
                 drawArc()
                 canvas.restore()
-                if (state.j == 2) {
-                    canvas.drawPointLine(pointAt135, pointAt45, state.scales[1], paint)
+                if (state.j >= 2) {
+                    paint.strokeWidth = Math.min(w, h) / 100
+                    canvas.drawPointLine(pointAt135, pointAt45, state.scales[2], paint)
                 }
                 canvas.restore()
             }
@@ -115,6 +117,7 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
             boundedCircle.draw(canvas, paint)
             boundedCircle.update {
                 BCAnimator.getInstance().stop(view)
+                render(canvas, paint)
             }
         }
 
