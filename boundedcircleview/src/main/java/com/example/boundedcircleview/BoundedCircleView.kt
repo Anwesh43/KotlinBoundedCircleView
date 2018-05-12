@@ -4,6 +4,7 @@ package com.example.boundedcircleview
  * Created by anweshmishra on 12/05/18.
  */
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.*
 import android.view.View
@@ -119,6 +120,24 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
                 BCAnimator.getInstance().start(view)
             }
         }
+    }
+
+    companion object {
+
+        fun create(activity : Activity) : BoundedCircleView {
+            val view : BoundedCircleView = BoundedCircleView(activity)
+            activity.setContentView(view)
+            return view
+        }
+
+        fun pause() {
+            BCAnimator.getInstance().pause()
+        }
+
+        fun resume() {
+            BCAnimator.getInstance().resume()
+        }
+
     }
 }
 
