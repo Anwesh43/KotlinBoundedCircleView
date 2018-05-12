@@ -18,6 +18,10 @@ class BoundedCircleView (ctx : Context) : View(ctx) {
 
     }
 
+    fun update() {
+        postInvalidate()
+    }
+    
     override fun onTouchEvent(event : MotionEvent) : Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
